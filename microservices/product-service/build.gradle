@@ -6,16 +6,13 @@ plugins {
 
 group = 'io.zhtmr.microservices.core.product'
 version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '1.8'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(8)
-	}
-}
 
 repositories {
 	mavenCentral()
 }
+
 
 dependencies {
 	implementation project(':api')
@@ -27,6 +24,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }
+
