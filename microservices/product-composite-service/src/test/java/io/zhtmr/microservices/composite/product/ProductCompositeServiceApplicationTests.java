@@ -3,6 +3,7 @@ package io.zhtmr.microservices.composite.product;
 import io.zhtmr.api.core.product.Product;
 import io.zhtmr.api.core.recommendation.Recommendation;
 import io.zhtmr.api.core.review.Review;
+import io.zhtmr.api.exceptions.InvalidInputException;
 import io.zhtmr.api.exceptions.NotFoundException;
 import io.zhtmr.microservices.composite.product.services.ProductCompositeIntegration;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 
 
@@ -41,6 +43,8 @@ class ProductCompositeServiceApplicationTests {
 
 		when(compositeIntegration.getProduct(PRODUCT_ID_NOT_FOUND))
 				.thenThrow(new NotFoundException("NOT FOUND: " + PRODUCT_ID_NOT_FOUND));
+		when(compositeIntegration.getProduct(PRODUCT_ID_INVALID))
+				.thenThrow(new InvalidInputException("INVALID: " + PRODUCT_ID_INVALID));
 	}
 
 
@@ -67,6 +71,19 @@ class ProductCompositeServiceApplicationTests {
 				.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_NOT_FOUND)
 				.jsonPath("$.message").isEqualTo("NOT FOUND: " + PRODUCT_ID_NOT_FOUND);
 	}
+
+	@Test
+	void getProductInvalidInput() {
+		client.get().uri("/product-composite/" + PRODUCT_ID_INVALID)
+				.accept(MediaType.APPLICATION_JSON)
+				.exchange()
+				.expectStatus().isEqualTo(UNPROCESSABLE_ENTITY)
+				.expectHeader().contentType(MediaType.APPLICATION_JSON)
+				.expectBody()
+				.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_INVALID)
+				.jsonPath("$.message").isEqualTo("INVALID: " + PRODUCT_ID_INVALID);
+	}
+
 	@Test
 	void contextLoads() {
 	}
